@@ -44,7 +44,14 @@
     },
     "files": [
       "out/**/*",
-      "resources/**/*"
+      "resources/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "node_modules/clipboardy/**",
+      "node_modules/@nut-tree-fork/**"
     ],
     "mac": {
       "category": "public.app-category.productivity",

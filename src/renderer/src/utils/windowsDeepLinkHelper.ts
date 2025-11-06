@@ -19,7 +19,8 @@ export interface DeepLinkDiagnostics {
  */
 export async function checkWindowsDeepLinkRegistration(): Promise<DeepLinkDiagnostics> {
   try {
-    return await invoke<DeepLinkDiagnostics>('verify_deep_link_protocols');
+    // Align with main handler name
+    return await invoke<DeepLinkDiagnostics>('verify-deep-link-protocols');
   } catch (error) {
     console.error('Failed to check deeplink registration:', error);
     throw error;
@@ -31,7 +32,8 @@ export async function checkWindowsDeepLinkRegistration(): Promise<DeepLinkDiagno
  */
 export async function checkProtocolRegistration(scheme: string): Promise<ProtocolRegistrationStatus> {
   try {
-    return await invoke<ProtocolRegistrationStatus>('check_protocol_registration', { scheme });
+    // Align with main handler name and argument shape
+    return await invoke<ProtocolRegistrationStatus>('check-protocol-registration', scheme);
   } catch (error) {
     console.error(`Failed to check protocol registration for ${scheme}:`, error);
     throw error;
@@ -42,33 +44,11 @@ export async function checkProtocolRegistration(scheme: string): Promise<Protoco
  * Attempt to register deeplink protocols on Windows (requires admin privileges)
  */
 export async function registerWindowsProtocols(): Promise<string[]> {
-  const results: string[] = [];
-  const protocols = ['clipify', 'appclipify', 'clipify-dev'];
-  
-  try {
-    // Get the current executable path
-    const appDir = await path.resolveResource('');
-    const executablePath = await path.join(appDir, '../Clipify.exe');
-    
-    for (const protocol of protocols) {
-      try {
-        const result = await invoke<string>('register_protocol_windows', {
-          scheme: protocol,
-          appPath: executablePath
-        });
-        results.push(`${protocol}: ${result}`);
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        results.push(`${protocol}: Failed - ${errorMsg}`);
-        console.error(`Failed to register ${protocol}:`, error);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to get executable path:', error);
-    throw new Error('Could not determine application path for protocol registration');
-  }
-  
-  return results;
+  // Registration is handled by the app on startup via app.setAsDefaultProtocolClient
+  // Provide a deterministic message instead of attempting unsupported operations from renderer
+  return [
+    'clipify: Registration attempted automatically on startup. If not registered, run the installer or start as Administrator.'
+  ];
 }
 
 /**
@@ -114,10 +94,9 @@ export async function showWindowsDeepLinkDiagnostics(): Promise<void> {
  */
 export async function testDeepLink(scheme: string = 'clipify', testData: string = 'test-auth-callback'): Promise<void> {
   const testUrl = `${scheme}://${testData}`;
-  
   try {
-    // On Windows, we can use the shell to open the URL
-    await invoke('open_url', { url: testUrl });
+    // Use Electron main handler name and expected argument shape
+    await invoke('open-url', testUrl);
     console.log(`🧪 Testing deeplink: ${testUrl}`);
   } catch (error) {
     console.error('Failed to test deeplink:', error);

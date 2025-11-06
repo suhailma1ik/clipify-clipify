@@ -222,7 +222,7 @@ class AuthService {
 
       // Show the main window after successful authentication
       try {
-        await invoke("show_main_window");
+        await invoke("show-main-window");
       } catch (windowError) {
         getLoggingService().warn(
           "auth",
